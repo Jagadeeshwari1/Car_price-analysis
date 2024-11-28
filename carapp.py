@@ -1,51 +1,72 @@
 import streamlit as st
-import matplotlib.pyplot as plt
-import seaborn as sns
+import pandas as pd
 
-# Display a scatter plot
-def scatter_plot(data, x_column, y_column):
-    st.write(f"Scatter plot: {x_column} vs {y_column}")
-    fig, ax = plt.subplots()
-    sns.scatterplot(data=data, x=x_column, y=y_column, ax=ax)
-    st.pyplot(fig)
+# Attempt to import matplotlib and seaborn
+try:
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+except ImportError as e:
+    st.error(f"An import error occurred: {e}. Please ensure the required libraries are installed by running:")
+    st.code("pip install matplotlib seaborn pandas", language="bash")
+    st.stop()
 
-# Display a heatmap
-def heatmap(data, pivot_index, pivot_columns, pivot_values, cmap='RdBu'):
-    st.write("Heatmap")
-    grouped_pivot = data.pivot(index=pivot_index, columns=pivot_columns, values=pivot_values)
-    fig, ax = plt.subplots()
-    sns.heatmap(grouped_pivot, cmap=cmap, ax=ax)
-    st.pyplot(fig)
-
-# Display a boxplot
-def boxplot(data, x_column, y_column):
-    st.write(f"Boxplot: {x_column} vs {y_column}")
-    fig, ax = plt.subplots()
-    sns.boxplot(data=data, x=x_column, y=y_column, ax=ax)
-    st.pyplot(fig)
-
-# Example Streamlit app layout
+# App Title
 st.title("Visualization Dashboard")
 
+# Load dataset directly from the provided URL
 uploaded_file = "https://raw.githubusercontent.com/klamsal/Fall2024Exam/refs/heads/main/CleanedAutomobile.csv"
-df = pd.read_csv(uploaded_file)
-st.write("Dataset Overview")
-st.write(df.head())
 
-    # User chooses visualization type
-    viz_type = st.selectbox("Select visualization type", ["Scatter Plot", "Heatmap", "Boxplot"])
-    if viz_type == "Scatter Plot":
-        x_col = st.selectbox("Select X-axis", df.columns)
-        y_col = st.selectbox("Select Y-axis", df.columns)
-        scatter_plot(df, x_col, y_col)
+try:
+    df = pd.read_csv(uploaded_file)
+    st.success("Dataset loaded successfully!")
+except Exception as e:
+    st.error(f"Error loading the dataset from the provided URL: {e}")
+    st.stop()
 
-    elif viz_type == "Heatmap":
-        index_col = st.selectbox("Select Index Column", df.columns)
-        columns_col = st.selectbox("Select Columns", df.columns)
-        values_col = st.selectbox("Select Values Column", df.columns)
-        heatmap(df, index_col, columns_col, values_col)
+# Display dataset overview
+st.write("### Dataset Overview")
+st.dataframe(df)
 
-    elif viz_type == "Boxplot":
-        x_col = st.selectbox("Select X-axis", df.columns)
-        y_col = st.selectbox("Select Y-axis", df.columns)
-        boxplot(df, x_col, y_col)
+# Visualization selection
+viz_type = st.selectbox("Choose a visualization type", ["Scatter Plot", "Heatmap", "Boxplot"])
+
+if viz_type == "Scatter Plot":
+    st.write("### Scatter Plot")
+    x_col = st.selectbox("Select X-axis column", df.columns)
+    y_col = st.selectbox("Select Y-axis column", df.columns)
+    try:
+        fig, ax = plt.subplots()
+        sns.scatterplot(data=df, x=x_col, y=y_col, ax=ax)
+        st.pyplot(fig)
+    except Exception as e:
+        st.error(f"Error creating scatter plot: {e}")
+
+elif viz_type == "Heatmap":
+    st.write("### Heatmap")
+    index_col = st.selectbox("Select Index column", df.columns)
+    columns_col = st.selectbox("Select Columns column", df.columns)
+    values_col = st.selectbox("Select Values column", df.columns)
+    try:
+        if pd.api.types.is_numeric_dtype(df[values_col]):
+            pivot_table = df.pivot(index=index_col, columns=columns_col, values=values_col)
+            fig, ax = plt.subplots(figsize=(10, 6))
+            sns.heatmap(pivot_table, annot=True, fmt=".1f", cmap="RdBu", ax=ax)
+            st.pyplot(fig)
+        else:
+            st.error("Heatmap requires numeric data for the Values column.")
+    except Exception as e:
+        st.error(f"Error creating heatmap: {e}")
+
+elif viz_type == "Boxplot":
+    st.write("### Boxplot")
+    x_col = st.selectbox("Select X-axis column", df.columns)
+    y_col = st.selectbox("Select Y-axis column", df.columns)
+    try:
+        if pd.api.types.is_numeric_dtype(df[y_col]):
+            fig, ax = plt.subplots()
+            sns.boxplot(data=df, x=x_col, y=y_col, ax=ax)
+            st.pyplot(fig)
+        else:
+            st.error("Boxplot requires numeric data for the Y-axis.")
+    except Exception as e:
+        st.error(f"Error creating boxplot: {e}")
