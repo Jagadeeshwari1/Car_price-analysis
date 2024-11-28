@@ -27,7 +27,7 @@ def boxplot(data, x_column, y_column):
 # Example Streamlit app layout
 st.title("Visualization Dashboard")
 
-uploaded_file = st.file_uploader("Upload your data", type=["csv", "xlsx"])
+uploaded_file = "https://raw.githubusercontent.com/klamsal/Fall2024Exam/refs/heads/main/CleanedAutomobile.csv"
 if uploaded_file:
     import pandas as pd
     # Assume CSV or Excel data
