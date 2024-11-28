@@ -28,16 +28,9 @@ def boxplot(data, x_column, y_column):
 st.title("Visualization Dashboard")
 
 uploaded_file = "https://raw.githubusercontent.com/klamsal/Fall2024Exam/refs/heads/main/CleanedAutomobile.csv"
-if uploaded_file:
-    import pandas as pd
-    # Assume CSV or Excel data
-    if uploaded_file.name.endswith(".csv"):
-        df = pd.read_csv(uploaded_file)
-    else:
-        df = pd.read_excel(uploaded_file)
-
-    st.write("Dataset Overview")
-    st.write(df.head())
+df = pd.read_csv(uploaded_file)
+st.write("Dataset Overview")
+st.write(df.head())
 
     # User chooses visualization type
     viz_type = st.selectbox("Select visualization type", ["Scatter Plot", "Heatmap", "Boxplot"])
