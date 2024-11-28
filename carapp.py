@@ -48,9 +48,8 @@ elif viz_type == "Heatmap":
     values_col = st.selectbox("Select Values column", df.columns)
     try:
         if pd.api.types.is_numeric_dtype(df[values_col]):
-            # Handle duplicate entries by aggregating with mean
-            grouped = df.groupby([index_col, columns_col])[values_col].mean().reset_index()
-            pivot_table = grouped.pivot(index=index_col, columns=columns_col, values=values_col)
+            # Use pivot_table() with aggregation to handle duplicates
+            pivot_table = df.pivot_table(index=index_col, columns=columns_col, values=values_col, aggfunc='mean')
             
             # Plot the heatmap
             fig, ax = plt.subplots(figsize=(10, 6))
