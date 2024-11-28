@@ -23,6 +23,9 @@ except Exception as e:
     st.error(f"Error loading the dataset from the provided URL: {e}")
     st.stop()
 
+# Convert 'symboling' column to categorical type
+df['symboling'] = df['symboling'].astype('category')
+
 # Display dataset overview
 st.write("### Dataset Overview")
 st.dataframe(df)
@@ -50,9 +53,9 @@ elif viz_type == "Heatmap":
         # Ensure the values column is numeric for heatmap
         if pd.api.types.is_numeric_dtype(df[values_col]):
             # Ensure index and columns are categorical
-            if pd.api.types.is_numeric_dtype(df[index_col]):
+            if pd.api.types.is_numeric_dtype(df[index_col]) and index_col != 'symboling':
                 st.error(f"The Index column '{index_col}' should be categorical. Please select a categorical column.")
-            elif pd.api.types.is_numeric_dtype(df[columns_col]):
+            elif pd.api.types.is_numeric_dtype(df[columns_col]) and columns_col != 'symboling':
                 st.error(f"The Columns column '{columns_col}' should be categorical. Please select a categorical column.")
             else:
                 # Handle duplicates by aggregating with mean
