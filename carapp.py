@@ -48,7 +48,11 @@ elif viz_type == "Heatmap":
     values_col = st.selectbox("Select Values column", df.columns)
     try:
         if pd.api.types.is_numeric_dtype(df[values_col]):
-            pivot_table = df.pivot(index=index_col, columns=columns_col, values=values_col)
+            # Handle duplicate entries by aggregating with mean
+            grouped = df.groupby([index_col, columns_col])[values_col].mean().reset_index()
+            pivot_table = grouped.pivot(index=index_col, columns=columns_col, values=values_col)
+            
+            # Plot the heatmap
             fig, ax = plt.subplots(figsize=(10, 6))
             sns.heatmap(pivot_table, annot=True, fmt=".1f", cmap="RdBu", ax=ax)
             st.pyplot(fig)
@@ -64,9 +68,4 @@ elif viz_type == "Boxplot":
     try:
         if pd.api.types.is_numeric_dtype(df[y_col]):
             fig, ax = plt.subplots()
-            sns.boxplot(data=df, x=x_col, y=y_col, ax=ax)
-            st.pyplot(fig)
-        else:
-            st.error("Boxplot requires numeric data for the Y-axis.")
-    except Exception as e:
-        st.error(f"Error creating boxplot: {e}")
+            sns.boxplot(data=df, x
