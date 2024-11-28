@@ -44,32 +44,7 @@ if viz_type == "Scatter Plot":
     except Exception as e:
         st.error(f"Error creating scatter plot: {e}")
 
-elif viz_type == "Heatmap":
-    st.write("### Heatmap")
-    index_col = st.selectbox("Select Index column", df.columns)
-    columns_col = st.selectbox("Select Columns column", df.columns)
-    values_col = st.selectbox("Select Values column", df.columns)
-    
-    try:
-        # Ensure the values column is numeric for heatmap
-        if pd.api.types.is_numeric_dtype(df[values_col]):
-            # Ensure index and columns are categorical
-            if pd.api.types.is_numeric_dtype(df[index_col]) and index_col != 'symboling':
-                st.error(f"The Index column '{index_col}' should be categorical. Please select a categorical column.")
-            elif pd.api.types.is_numeric_dtype(df[columns_col]) and columns_col != 'symboling':
-                st.error(f"The Columns column '{columns_col}' should be categorical. Please select a categorical column.")
-            else:
-                # Handle duplicates by aggregating with mean
-                pivot_table = df.pivot_table(index=index_col, columns=columns_col, values=values_col, aggfunc='mean')
-                
-                # Plot the heatmap
-                fig, ax = plt.subplots(figsize=(10, 6))
-                sns.heatmap(pivot_table, annot=True, fmt=".1f", cmap="RdBu", ax=ax)
-                st.pyplot(fig)
-        else:
-            st.error(f"Heatmap requires numeric data for the '{values_col}' column. Please select a numeric column for the values.")
-    except Exception as e:
-        st.error(f"Error creating heatmap: {e}")
+
 
 elif viz_type == "Boxplot":
     st.write("### Boxplot")
