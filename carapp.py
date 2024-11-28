@@ -84,4 +84,3 @@ elif viz_type == "Boxplot":
             st.error("Boxplot requires numeric data for the Y-axis.")
     except Exception as e:
         st.error(f"Error creating boxplot: {e}")
-
