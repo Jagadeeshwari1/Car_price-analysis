@@ -49,6 +49,7 @@ elif viz_type == "Heatmap":
     index_col = st.selectbox("Select Index column", df.columns)
     columns_col = st.selectbox("Select Columns column", df.columns)
     values_col = st.selectbox("Select Values column", df.columns)
+    
     try:
         # Ensure the values column is numeric for heatmap
         if pd.api.types.is_numeric_dtype(df[values_col]):
@@ -66,7 +67,7 @@ elif viz_type == "Heatmap":
                 sns.heatmap(pivot_table, annot=True, fmt=".1f", cmap="RdBu", ax=ax)
                 st.pyplot(fig)
         else:
-            st.error("Heatmap requires numeric data for the Values column.")
+            st.error(f"Heatmap requires numeric data for the '{values_col}' column. Please select a numeric column for the values.")
     except Exception as e:
         st.error(f"Error creating heatmap: {e}")
 
@@ -83,3 +84,4 @@ elif viz_type == "Boxplot":
             st.error("Boxplot requires numeric data for the Y-axis.")
     except Exception as e:
         st.error(f"Error creating boxplot: {e}")
+
