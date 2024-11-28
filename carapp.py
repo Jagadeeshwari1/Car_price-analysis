@@ -68,4 +68,9 @@ elif viz_type == "Boxplot":
     try:
         if pd.api.types.is_numeric_dtype(df[y_col]):
             fig, ax = plt.subplots()
-            sns.boxplot(data=df, x
+            sns.boxplot(data=df, x=x_col, y=y_col, ax=ax)
+            st.pyplot(fig)
+        else:
+            st.error("Boxplot requires numeric data for the Y-axis.")
+    except Exception as e:
+        st.error(f"Error creating boxplot: {e}")
