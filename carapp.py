@@ -47,14 +47,21 @@ elif viz_type == "Heatmap":
     columns_col = st.selectbox("Select Columns column", df.columns)
     values_col = st.selectbox("Select Values column", df.columns)
     try:
+        # Ensure the values column is numeric for heatmap
         if pd.api.types.is_numeric_dtype(df[values_col]):
-            # Use pivot_table() with aggregation to handle duplicates
-            pivot_table = df.pivot_table(index=index_col, columns=columns_col, values=values_col, aggfunc='mean')
-            
-            # Plot the heatmap
-            fig, ax = plt.subplots(figsize=(10, 6))
-            sns.heatmap(pivot_table, annot=True, fmt=".1f", cmap="RdBu", ax=ax)
-            st.pyplot(fig)
+            # Ensure index and columns are categorical
+            if pd.api.types.is_numeric_dtype(df[index_col]):
+                st.error(f"The Index column '{index_col}' should be categorical. Please select a categorical column.")
+            elif pd.api.types.is_numeric_dtype(df[columns_col]):
+                st.error(f"The Columns column '{columns_col}' should be categorical. Please select a categorical column.")
+            else:
+                # Handle duplicates by aggregating with mean
+                pivot_table = df.pivot_table(index=index_col, columns=columns_col, values=values_col, aggfunc='mean')
+                
+                # Plot the heatmap
+                fig, ax = plt.subplots(figsize=(10, 6))
+                sns.heatmap(pivot_table, annot=True, fmt=".1f", cmap="RdBu", ax=ax)
+                st.pyplot(fig)
         else:
             st.error("Heatmap requires numeric data for the Values column.")
     except Exception as e:
