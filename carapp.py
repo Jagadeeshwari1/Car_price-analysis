@@ -44,11 +44,38 @@ if viz_type == "Scatter Plot":
     except Exception as e:
         st.error(f"Error creating scatter plot: {e}")
 
-elif viz_type == "Heatmap":
+
+
+
+
+# Separate numerical and categorical columns
+numerical_cols = df.select_dtypes(include=['number']).columns.tolist()
+categorical_cols = df.select_dtypes(include=['object']).columns.tolist()
+
+# Streamlit app setup
+st.title("Data Visualization App")
+
+# Heatmap Section
+viz_type = st.selectbox("Select Visualization Type", ["Heatmap", "Other"])
+if viz_type == "Heatmap":
     st.write("### Heatmap")
-    index_col = st.selectbox("Select Index column", df.columns)
-    columns_col = st.selectbox("Select Columns column", df.columns)
-    values_col = st.selectbox("Select Values column", df.columns)
+    
+    # Select columns for heatmap
+    index_col = st.selectbox("Select Index column", numerical_cols)
+    columns_col = st.selectbox("Select Columns column", numerical_cols)
+    values_col = st.selectbox("Select Values column", numerical_cols)
+    
+    # Check if valid columns are selected
+    if index_col and columns_col and values_col:
+        # Pivot the data for heatmap
+        pivot_df = df.pivot_table(index=index_col, columns=columns_col, values=values_col, aggfunc='mean')
+        
+        # Plot the heatmap
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(pivot_df, annot=True, cmap='coolwarm', fmt='.2f')
+        plt.title(f"Heatmap: {values_col} by {index_col} and {columns_col}")
+        st.pyplot(plt)
+
     
     try:
         # Ensure the values column is numeric for heatmap
